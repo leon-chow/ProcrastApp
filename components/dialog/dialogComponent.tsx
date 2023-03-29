@@ -1,37 +1,71 @@
-import React from 'react';
-import {Modal, Text, Button, View} from 'react-native';
+import React, {useState} from 'react';
+import {Modal, Text, Button, View, TextInput, StyleSheet} from 'react-native';
 
 interface IProps {
-  visible: boolean;
   title: string;
-  onSubmit: void;
-  onDismiss: void;
+  onSubmit: Function;
+  onDismiss: Function;
 }
-const DialogComponent = ({
-  visible,
-  title,
-  onSubmit,
-  onDismiss,
-}: IProps): JSX.Element => {
-  console.log(title, visible);
+const DialogComponent = ({title, onSubmit, onDismiss}: IProps): JSX.Element => {
+  const [todo, setTodo] = useState<string>('');
+  const handleOnSubmit = () => {
+    onSubmit(todo);
+  };
+
+  const handleOnDismiss = () => {
+    onDismiss();
+  };
+
+  const handleInputChange = (text: string) => {
+    setTodo(text);
+  };
+
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onDismiss={() => onDismiss}>
-      <View> {title} </View>
+    <Modal animationType="slide">
       <View>
-        <Text>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Earum
-          eligendi inventore, laboriosam laudantium minima minus nesciunt
-          pariatur sequi.
-        </Text>
+        <Text style={styles.header}>{title}</Text>
       </View>
-      <Button title="Cancel" onPress={() => onDismiss} />
-      <Button title="Ok" onPress={() => onSubmit} />
+      <View>
+        <TextInput
+          style={styles.textHeader}
+          placeholder="Please enter your todo item"
+          onChangeText={handleInputChange}
+        />
+      </View>
+      <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+          <Button title="Cancel" onPress={handleOnDismiss} />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button title="Add Todo" onPress={handleOnSubmit} />
+        </View>
+      </View>
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    margin: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  textHeader: {
+    margin: 10,
+    padding: 10,
+    fontSize: 16,
+  },
+  buttonContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  header: {
+    fontWeight: 'bold',
+    padding: 10,
+    fontSize: 32,
+    textAlign: 'center',
+  },
+});
 
 export default DialogComponent;

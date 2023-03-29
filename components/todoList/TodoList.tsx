@@ -4,31 +4,51 @@ import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
 const TodoList = (): JSX.Element => {
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      name: 'todo',
-      id: 1,
-      value: 'string',
-    },
-  ]);
+  const handleDismiss = () => {
+    setShowDialog(false);
+  };
+  const handleTodo = (text: string) => {
+    if (!text) {
+      handleDismiss();
+      return;
+    }
+    setShowDialog(false);
+    const newTodo: Todo = {
+      id: todos.length + 1,
+      value: text,
+    };
+    todos.push(newTodo);
+    console.log(todos);
+  };
+
+  const [todos] = useState<Todo[]>([]);
   const [showDialog, setShowDialog] = useState(false);
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View>
           <Text style={styles.header}>Todo: </Text>
-          <Button title={'Add Todo'} onPress={() => setShowDialog(true)} />
-          {todos &&
-            todos.map(todo => {
-              return <Text key={todo.id}> {todo.value} </Text>;
-            })}
+          <View style={styles.todoList}>
+            {todos &&
+              todos.map(todo => {
+                return (
+                  <View key={todo.id}>
+                    <Text style={styles.todoText}>
+                      {'\u2022'} {todo.value}
+                    </Text>
+                  </View>
+                );
+              })}
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button title={'Add Todo'} onPress={() => setShowDialog(true)} />
+          </View>
         </View>
         {showDialog && (
           <DialogComponent
-            visible={showDialog}
             title={'Add Todo'}
-            onSubmit={setTodos(todos)}
-            onDismiss={setShowDialog(false)}
+            onSubmit={handleTodo}
+            onDismiss={handleDismiss}
           />
         )}
       </ScrollView>
@@ -38,7 +58,8 @@ const TodoList = (): JSX.Element => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
+    margin: 10,
+    padding: 10,
   },
   header: {
     color: 'red',
@@ -46,6 +67,17 @@ const styles = StyleSheet.create({
     fontSize: 32,
     textAlign: 'center',
     flex: 1,
+  },
+  buttonContainer: {
+    padding: 10,
+    margin: 10,
+  },
+  todoList: {
+    padding: 10,
+    margin: 10,
+  },
+  todoText: {
+    fontSize: 24,
   },
 });
 
