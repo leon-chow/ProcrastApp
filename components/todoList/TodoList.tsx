@@ -1,13 +1,25 @@
 import React, {useState} from 'react';
-import {SafeAreaView, ScrollView, Text, View, StyleSheet} from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
 const TodoList = (): JSX.Element => {
+  const [todos] = useState<Todo[]>([]);
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('Add Todo');
+  const [selectedTodo, setSelectedTodo] = useState<Todo>();
   const handleDismiss = () => {
     setShowDialog(false);
   };
-  const handleTodo = (text: string) => {
+  const handleAddTodo = (text: string) => {
+    console.log('adding...');
     if (!text) {
       handleDismiss();
       return;
@@ -18,11 +30,14 @@ const TodoList = (): JSX.Element => {
       value: text,
     };
     todos.push(newTodo);
-    console.log(todos);
+  };
+  const handleEditTodo = (newText: string) => {
+    console.log('editing...');
+    const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
+    todos[todoIndex].value = newText;
+    setShowDialog(false);
   };
 
-  const [todos] = useState<Todo[]>([]);
-  const [showDialog, setShowDialog] = useState(false);
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
@@ -32,23 +47,39 @@ const TodoList = (): JSX.Element => {
             {todos &&
               todos.map(todo => {
                 return (
-                  <View key={todo.id}>
-                    <Text style={styles.todoText}>
+                  <TouchableOpacity
+                    key={todo.id}
+                    onPress={() => {
+                      setDialogTitle(`Edit Todo #${todo.id}`);
+                      setShowDialog(true);
+                      setSelectedTodo(todo);
+                    }}
+                    style={styles.todoItem}>
+                    <Text style={styles.todoText} numberOfLines={2}>
                       {'\u2022'} {todo.value}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 );
               })}
           </View>
           <View style={styles.buttonContainer}>
-            <Button title={'Add Todo'} onPress={() => setShowDialog(true)} />
+            <Button
+              title={'Add Todo'}
+              color="dodgerblue"
+              onPress={() => {
+                setShowDialog(true);
+                setSelectedTodo(undefined);
+                setDialogTitle(`Add Todo #${todos.length + 1}`);
+              }}
+            />
           </View>
         </View>
         {showDialog && (
           <DialogComponent
-            title={'Add Todo'}
-            onSubmit={handleTodo}
+            title={dialogTitle}
+            onSubmit={selectedTodo ? handleEditTodo : handleAddTodo}
             onDismiss={handleDismiss}
+            selectedTodo={selectedTodo}
           />
         )}
       </ScrollView>
@@ -62,7 +93,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   header: {
-    color: 'red',
     padding: 10,
     fontSize: 32,
     textAlign: 'center',
@@ -78,6 +108,12 @@ const styles = StyleSheet.create({
   },
   todoText: {
     fontSize: 24,
+  },
+  todoItem: {
+    borderWidth: 1,
+    padding: 10,
+    margin: 10,
+    borderRadius: 10,
   },
 });
 

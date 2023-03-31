@@ -1,13 +1,20 @@
 import React, {useState} from 'react';
 import {Modal, Text, Button, View, TextInput, StyleSheet} from 'react-native';
+import {Todo} from '../../utils/interfaces/Todo';
 
 interface IProps {
   title: string;
   onSubmit: Function;
   onDismiss: Function;
+  selectedTodo?: Todo;
 }
-const DialogComponent = ({title, onSubmit, onDismiss}: IProps): JSX.Element => {
-  const [todo, setTodo] = useState<string>('');
+const DialogComponent = ({
+  title,
+  onSubmit,
+  onDismiss,
+  selectedTodo,
+}: IProps): JSX.Element => {
+  const [todo, setTodo] = useState<string>(selectedTodo?.value || '');
   const handleOnSubmit = () => {
     onSubmit(todo);
   };
@@ -30,6 +37,8 @@ const DialogComponent = ({title, onSubmit, onDismiss}: IProps): JSX.Element => {
           style={styles.textHeader}
           placeholder="Please enter your todo item"
           onChangeText={handleInputChange}
+          underlineColorAndroid="black"
+          defaultValue={selectedTodo ? selectedTodo.value : ''}
         />
       </View>
       <View style={styles.container}>
@@ -37,7 +46,7 @@ const DialogComponent = ({title, onSubmit, onDismiss}: IProps): JSX.Element => {
           <Button title="Cancel" onPress={handleOnDismiss} />
         </View>
         <View style={styles.buttonContainer}>
-          <Button title="Add Todo" onPress={handleOnSubmit} />
+          <Button title="Save" onPress={handleOnSubmit} />
         </View>
       </View>
     </Modal>
