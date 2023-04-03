@@ -53,7 +53,7 @@ const TodoList = (): JSX.Element => {
         <View>
           <Text style={styles.header}>Todo: </Text>
           <View style={styles.todoList}>
-            {todos &&
+            {todos && todos.length > 0 ? (
               todos.map(todo => {
                 return (
                   <View style={styles.todoItem} key={todo.id}>
@@ -77,7 +77,15 @@ const TodoList = (): JSX.Element => {
                     </TouchableOpacity>
                   </View>
                 );
-              })}
+              })
+            ) : (
+              <View>
+                <Text style={styles.todoPrompt}>
+                  Hooray! You have nothing left todo... To get started, you can
+                  add a new todo...
+                </Text>
+              </View>
+            )}
           </View>
           <View style={styles.buttonContainer}>
             <Button
@@ -148,6 +156,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  todoPrompt: {
+    fontStyle: 'italic',
+    color: 'gray',
   },
   deleteButton: {
     alignContent: 'flex-end',
