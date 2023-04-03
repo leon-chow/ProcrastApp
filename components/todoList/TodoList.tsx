@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
   Text,
   View,
-  StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import {styles} from './todoList.style';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
@@ -20,31 +21,86 @@ const TodoList = (): JSX.Element => {
     setShowDialog(false);
   };
 
-  const handleAddTodo = (text: string): void => {
+  useEffect(() => {
+    loadTodos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadTodos = async () => {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const data = await AsyncStorage.multiGet(keys);
+      const allTodos: Todo[] = [];
+      for (const record of data) {
+        const todo: Todo = {
+          id: +record[0],
+          value: JSON.parse(record[1]!),
+        };
+        allTodos.push(todo);
+      }
+      setTodos(allTodos);
+    } catch (err) {
+      console.error(err);
+    }
+    console.log(todos);
+  };
+
+  const handleAddTodo = async (text: string): Promise<void> => {
     console.log('adding...');
+    const seed = Math.floor(Math.random() * 10000000) + 1;
+    const newID = seed + todos.length + 1;
     if (!text) {
       handleDismiss();
       return;
     }
-    setShowDialog(false);
     const newTodo: Todo = {
-      id: todos.length + 1,
+      id: newID,
       value: text,
     };
+    try {
+      await AsyncStorage.setItem(
+        `${newID}`,
+        JSON.stringify(newTodo.value),
+        () => {
+          console.log(`successfully saved todo with id ${newID}`);
+        },
+      );
+    } catch (err) {
+      throw err;
+    }
     todos.push(newTodo);
+    setShowDialog(false);
   };
 
-  const handleEditTodo = (newText: string): void => {
+  const handleEditTodo = async (newText: string): Promise<void> => {
     console.log('editing...');
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
     todos[todoIndex].value = newText;
+    try {
+      await AsyncStorage.setItem(
+        `${selectedTodo!.id}`,
+        JSON.stringify(newText),
+        () => {
+          console.log(`successfully saved todo with id ${selectedTodo!.id}`);
+        },
+      );
+    } catch (err) {
+      throw err;
+    }
     setShowDialog(false);
   };
 
-  const handleDeleteTodo = (todoID: number): void => {
+  const handleDeleteTodo = async (todoID: number): Promise<void> => {
     console.log('deleting...');
     const newTodos = todos.filter(todo => todo.id !== todoID);
     setTodos(newTodos);
+    try {
+      await AsyncStorage.removeItem(`${todoID}`, () => {
+        console.log(`successfully removed todo with ID ${todoID}`);
+      });
+    } catch (err) {
+      throw err;
+    }
   };
 
   return (
@@ -81,7 +137,7 @@ const TodoList = (): JSX.Element => {
             ) : (
               <View>
                 <Text style={styles.todoPrompt}>
-                  Hooray! You have nothing left todo... To get started, you can
+                  Hooray! You have nothing left to do... To get started, you can
                   add a new todo...
                 </Text>
               </View>
@@ -111,61 +167,5 @@ const TodoList = (): JSX.Element => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    margin: 10,
-    padding: 10,
-  },
-  header: {
-    padding: 10,
-    fontSize: 32,
-    textAlign: 'center',
-    flex: 1,
-  },
-  buttonContainer: {
-    padding: 10,
-    margin: 10,
-  },
-  todoList: {
-    padding: 10,
-    margin: 10,
-  },
-  todoLeft: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignContent: 'flex-start',
-  },
-  todoRight: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignContent: 'flex-end',
-    alignItems: 'center',
-  },
-  todoText: {
-    fontSize: 24,
-  },
-  todoItem: {
-    flexDirection: 'row',
-    borderWidth: 1,
-    padding: 10,
-    margin: 10,
-    borderRadius: 10,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  todoPrompt: {
-    fontStyle: 'italic',
-    color: 'gray',
-  },
-  deleteButton: {
-    alignContent: 'flex-end',
-    justifyContent: 'flex-end',
-    fontSize: 24,
-  },
-});
 
 export default TodoList;
