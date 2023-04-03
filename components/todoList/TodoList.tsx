@@ -11,7 +11,7 @@ import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
 const TodoList = (): JSX.Element => {
-  const [todos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('Add Todo');
   const [selectedTodo, setSelectedTodo] = useState<Todo>();
@@ -43,7 +43,8 @@ const TodoList = (): JSX.Element => {
 
   const handleDeleteTodo = (todoID: number): void => {
     console.log('deleting...');
-    // const todoIndex = todos.findIndex(todo => todo.id === todoID);
+    const newTodos = todos.filter(todo => todo.id !== todoID);
+    setTodos(newTodos);
   };
 
   return (
