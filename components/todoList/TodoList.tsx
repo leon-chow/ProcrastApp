@@ -15,10 +15,12 @@ const TodoList = (): JSX.Element => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('Add Todo');
   const [selectedTodo, setSelectedTodo] = useState<Todo>();
+
   const handleDismiss = () => {
     setShowDialog(false);
   };
-  const handleAddTodo = (text: string) => {
+
+  const handleAddTodo = (text: string): void => {
     console.log('adding...');
     if (!text) {
       handleDismiss();
@@ -31,11 +33,17 @@ const TodoList = (): JSX.Element => {
     };
     todos.push(newTodo);
   };
-  const handleEditTodo = (newText: string) => {
+
+  const handleEditTodo = (newText: string): void => {
     console.log('editing...');
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
     todos[todoIndex].value = newText;
     setShowDialog(false);
+  };
+
+  const handleDeleteTodo = (todoID: number): void => {
+    console.log('deleting...');
+    // const todoIndex = todos.findIndex(todo => todo.id === todoID);
   };
 
   return (
@@ -47,18 +55,26 @@ const TodoList = (): JSX.Element => {
             {todos &&
               todos.map(todo => {
                 return (
-                  <TouchableOpacity
-                    key={todo.id}
-                    onPress={() => {
-                      setDialogTitle(`Edit Todo #${todo.id}`);
-                      setShowDialog(true);
-                      setSelectedTodo(todo);
-                    }}
-                    style={styles.todoItem}>
-                    <Text style={styles.todoText} numberOfLines={2}>
-                      {'\u2022'} {todo.value}
-                    </Text>
-                  </TouchableOpacity>
+                  <View style={styles.todoItem} key={todo.id}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setDialogTitle(`Edit Todo #${todo.id}`);
+                        setShowDialog(true);
+                        setSelectedTodo(todo);
+                      }}
+                      style={styles.todoLeft}>
+                      <Text style={styles.todoText} numberOfLines={2}>
+                        {'\u2022'} {todo.value}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.todoRight}
+                        onPress={() => {
+                          handleDeleteTodo(todo.id);
+                        }}>
+                        <Text style={styles.deleteButton}> X </Text>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 );
               })}
           </View>
@@ -106,14 +122,36 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
   },
+  todoLeft: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignContent: 'flex-start',
+  },
+  todoRight: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignContent: 'flex-end',
+    alignItems: 'center',
+  },
   todoText: {
     fontSize: 24,
   },
   todoItem: {
+    flexDirection: 'row',
     borderWidth: 1,
     padding: 10,
     margin: 10,
     borderRadius: 10,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  deleteButton: {
+    alignContent: 'flex-end',
+    justifyContent: 'flex-end',
+    fontSize: 24,
   },
 });
 

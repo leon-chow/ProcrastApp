@@ -38,6 +38,7 @@ const DialogComponent = ({
           placeholder="Please enter your todo item"
           onChangeText={handleInputChange}
           underlineColorAndroid="black"
+          placeholderTextColor={'gray'}
           defaultValue={selectedTodo ? selectedTodo.value : ''}
         />
       </View>
@@ -61,6 +62,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   textHeader: {
+    color: 'black',
     margin: 10,
     padding: 10,
     fontSize: 16,
