@@ -23,7 +23,6 @@ const TodoList = (): JSX.Element => {
 
   useEffect(() => {
     loadTodos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadTodos = async () => {
@@ -42,20 +41,19 @@ const TodoList = (): JSX.Element => {
     } catch (err) {
       console.error(err);
     }
-    console.log(todos);
   };
 
-  const handleAddTodo = async (text: string): Promise<void> => {
+  const handleAddTodo = async (todo: string): Promise<void> => {
     console.log('adding...');
     const seed = Math.floor(Math.random() * 10000000) + 1;
     const newID = seed + todos.length + 1;
-    if (!text) {
+    if (!todo) {
       handleDismiss();
       return;
     }
     const newTodo: Todo = {
       id: newID,
-      value: text,
+      value: todo,
     };
     try {
       await AsyncStorage.setItem(
@@ -123,14 +121,14 @@ const TodoList = (): JSX.Element => {
                       <Text style={styles.todoText} numberOfLines={2}>
                         {'\u2022'} {todo.value}
                       </Text>
-                      <TouchableOpacity
-                        style={styles.todoRight}
-                        onPress={() => {
-                          handleDeleteTodo(todo.id);
-                        }}>
-                        <Text style={styles.deleteButton}> X </Text>
-                      </TouchableOpacity>
                     </TouchableOpacity>
+                    <Text
+                      style={styles.deleteButton}
+                      onPress={() => {
+                        handleDeleteTodo(todo.id);
+                      }}>
+                      X
+                    </Text>
                   </View>
                 );
               })

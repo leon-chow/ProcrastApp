@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Modal, Text, Button, View, TextInput, StyleSheet} from 'react-native';
 import {Todo} from '../../utils/interfaces/Todo';
+import DatePicker from 'react-native-date-picker';
 
 interface IProps {
   title: string;
@@ -14,7 +15,19 @@ const DialogComponent = ({
   onDismiss,
   selectedTodo,
 }: IProps): JSX.Element => {
+  const oneWeekLater = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate() + 7,
+    new Date().getHours(),
+    new Date().getMinutes(),
+    new Date().getSeconds(),
+  );
   const [todo, setTodo] = useState<string>(selectedTodo?.value || '');
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date(oneWeekLater));
+  const [startDateDialog, setStartDateDialog] = useState<boolean>(false);
+  const [endDateDialog, setEndDateDialog] = useState<boolean>(false);
   const handleOnSubmit = () => {
     onSubmit(todo);
   };
@@ -40,6 +53,48 @@ const DialogComponent = ({
           underlineColorAndroid="black"
           placeholderTextColor={'gray'}
           defaultValue={selectedTodo ? selectedTodo.value : ''}
+        />
+        <Text
+          style={startDate ? styles.datePickerPrompt : styles.placeholder}
+          onPress={() => setStartDateDialog(true)}>
+          Start Date & Time:{' '}
+          {startDate
+            ? `${startDate.toDateString()} ${startDate.toLocaleTimeString()}`
+            : 'Please enter a start date...'}
+        </Text>
+        <Text
+          style={endDate ? styles.datePickerPrompt : styles.placeholder}
+          onPress={() => setEndDateDialog(true)}>
+          End Date & Time:{' '}
+          {endDate
+            ? `${endDate.toDateString()} ${endDate.toLocaleTimeString()}`
+            : 'Please enter an end date...'}
+        </Text>
+        <DatePicker
+          modal
+          open={startDateDialog}
+          date={startDate}
+          onConfirm={date => {
+            setStartDateDialog(false);
+            console.log(`setting new date: ${date}`);
+            setStartDate(date);
+          }}
+          onCancel={() => {
+            setStartDateDialog(false);
+          }}
+        />
+        <DatePicker
+          modal
+          open={endDateDialog}
+          date={endDate}
+          onConfirm={date => {
+            setEndDateDialog(false);
+            console.log(`setting new date: ${date}`);
+            setEndDate(date);
+          }}
+          onCancel={() => {
+            setEndDateDialog(false);
+          }}
         />
       </View>
       <View style={styles.container}>
@@ -72,10 +127,21 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   header: {
+    color: 'black',
     fontWeight: 'bold',
     padding: 10,
     fontSize: 32,
     textAlign: 'center',
+  },
+  datePickerPrompt: {
+    padding: 10,
+    color: 'black',
+    textAlign: 'center',
+  },
+  placeholder: {
+    fontStyle: 'italic',
+    textAlign: 'center',
+    color: 'gray',
   },
 });
 
