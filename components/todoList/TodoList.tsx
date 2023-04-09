@@ -31,55 +31,71 @@ const TodoList = (): JSX.Element => {
       const data = await AsyncStorage.multiGet(keys);
       const allTodos: Todo[] = [];
       for (const record of data) {
+        const recordData = JSON.parse(record[1]!);
+        console.log('record: ', recordData);
         const todo: Todo = {
-          id: +record[0],
-          value: JSON.parse(record[1]!),
+          id: recordData.id,
+          value: recordData.value,
+          startDate: recordData.startDate,
+          endDate: recordData.endDate,
         };
         allTodos.push(todo);
       }
       setTodos(allTodos);
+      console.log(allTodos);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleAddTodo = async (todo: string): Promise<void> => {
+  const handleAddTodo = async (todo: any): Promise<void> => {
     console.log('adding...');
     const seed = Math.floor(Math.random() * 10000000) + 1;
     const newID = seed + todos.length + 1;
+    console.log(todo);
     if (!todo) {
       handleDismiss();
       return;
     }
     const newTodo: Todo = {
       id: newID,
-      value: todo,
+      value: todo[0],
+      startDate: todo[1],
+      endDate: todo[2],
     };
     try {
-      await AsyncStorage.setItem(
-        `${newID}`,
-        JSON.stringify(newTodo.value),
-        () => {
-          console.log(`successfully saved todo with id ${newID}`);
-        },
-      );
+      await AsyncStorage.setItem(`${newID}`, JSON.stringify(newTodo), () => {
+        console.log(
+          `successfully saved todo with id ${newID} with details of ${newTodo}`,
+        );
+      });
     } catch (err) {
       throw err;
     }
     todos.push(newTodo);
+    loadTodos();
     setShowDialog(false);
   };
 
-  const handleEditTodo = async (newText: string): Promise<void> => {
+  const handleEditTodo = async (newTodo: any): Promise<void> => {
     console.log('editing...');
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
-    todos[todoIndex].value = newText;
+    todos[todoIndex] = {
+      ...todos[todoIndex],
+      value: newTodo[0],
+      startDate: newTodo[1],
+      endDate: newTodo[2],
+    };
     try {
       await AsyncStorage.setItem(
         `${selectedTodo!.id}`,
-        JSON.stringify(newText),
+        JSON.stringify(todos[todoIndex]),
         () => {
-          console.log(`successfully saved todo with id ${selectedTodo!.id}`);
+          console.log(
+            `successfully saved todo with id ${
+              selectedTodo!.id
+            } with details of ${newTodo}`,
+          );
         },
       );
     } catch (err) {

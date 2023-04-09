@@ -24,12 +24,17 @@ const DialogComponent = ({
     new Date().getSeconds(),
   );
   const [todo, setTodo] = useState<string>(selectedTodo?.value || '');
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date(oneWeekLater));
+  const [startDate, setStartDate] = useState<Date>(
+    selectedTodo ? new Date(selectedTodo?.startDate!) : new Date(),
+  );
+  const [endDate, setEndDate] = useState<Date>(
+    selectedTodo ? new Date(selectedTodo?.endDate!) : new Date(oneWeekLater),
+  );
   const [startDateDialog, setStartDateDialog] = useState<boolean>(false);
   const [endDateDialog, setEndDateDialog] = useState<boolean>(false);
   const handleOnSubmit = () => {
-    onSubmit(todo);
+    const newTodo = [todo, startDate, endDate];
+    onSubmit(newTodo);
   };
 
   const handleOnDismiss = () => {
@@ -76,8 +81,8 @@ const DialogComponent = ({
           date={startDate}
           onConfirm={date => {
             setStartDateDialog(false);
-            console.log(`setting new date: ${date}`);
             setStartDate(date);
+            console.log(`new start date: ${startDate}`);
           }}
           onCancel={() => {
             setStartDateDialog(false);
@@ -89,8 +94,8 @@ const DialogComponent = ({
           date={endDate}
           onConfirm={date => {
             setEndDateDialog(false);
-            console.log(`setting new date: ${date}`);
             setEndDate(date);
+            console.log(`new end date: ${endDate}`);
           }}
           onCancel={() => {
             setEndDateDialog(false);
@@ -137,11 +142,13 @@ const styles = StyleSheet.create({
     padding: 10,
     color: 'black',
     textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   placeholder: {
     fontStyle: 'italic',
     textAlign: 'center',
     color: 'gray',
+    textDecorationLine: 'underline',
   },
 });
 
