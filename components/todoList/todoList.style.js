@@ -20,18 +20,21 @@ export const styles = StyleSheet.create({
   },
   todoLeft: {
     flexDirection: 'row',
-    flex: 1,
     justifyContent: 'flex-start',
     alignContent: 'flex-start',
-    maxWidth: '95%',
+  },
+  todoCenter: {
+    flexDirection: 'column',
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
   },
   todoRight: {
     flexDirection: 'row',
     minWidth: 30,
-    flex: 1,
     justifyContent: 'flex-end',
     alignContent: 'flex-end',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   todoText: {
     fontSize: 24,
@@ -44,13 +47,13 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   todoPrompt: {
     fontStyle: 'italic',
     color: 'gray',
   },
-  deleteButton: {
+  button: {
     alignContent: 'flex-end',
     justifyContent: 'flex-end',
     fontSize: 24,

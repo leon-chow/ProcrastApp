@@ -25,10 +25,11 @@ const DialogComponent = ({
   const [dueDate, setDueDate] = useState<Date>(
     selectedTodo ? new Date(selectedTodo.dueDate) : tomorrow,
   );
+  const [isComplete, setIsComplete] = useState<boolean>(false);
   const [dateDialog, setDateDialog] = useState<boolean>(false);
 
   const handleOnSubmit = () => {
-    const newTodo = [todo, dueDate];
+    const newTodo = [todo, dueDate, isComplete];
     onSubmit(newTodo);
   };
 
@@ -59,7 +60,10 @@ const DialogComponent = ({
           onPress={() => setDateDialog(true)}>
           Due Date:{' '}
           {dueDate
-            ? `${dueDate.toDateString()} ${dueDate.toLocaleTimeString()}`
+            ? `${dueDate.toDateString()} ${dueDate.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}`
             : 'Please enter a due date...'}
         </Text>
         <DatePicker
@@ -76,6 +80,7 @@ const DialogComponent = ({
             setDateDialog(false);
           }}
         />
+        <Text> {isComplete} </Text>
       </View>
       <View style={styles.container}>
         <View style={styles.buttonContainer}>

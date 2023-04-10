@@ -37,6 +37,7 @@ const TodoList = (): JSX.Element => {
           id: recordData.id,
           value: recordData.value,
           dueDate: recordData.dueDate,
+          isComplete: false,
         };
         allTodos.push(todo);
       }
@@ -49,8 +50,7 @@ const TodoList = (): JSX.Element => {
 
   const handleAddTodo = async (todo: any): Promise<void> => {
     console.log('adding...');
-    const seed = Math.floor(Math.random() * 10000000) + 1;
-    const newID = seed + todos.length + 1;
+    const newID = todos.length + 1;
     console.log(todo);
     if (!todo) {
       handleDismiss();
@@ -60,6 +60,7 @@ const TodoList = (): JSX.Element => {
       id: newID,
       value: todo[0],
       dueDate: todo[1],
+      isComplete: false,
     };
     try {
       await AsyncStorage.setItem(`${newID}`, JSON.stringify(newTodo), () => {
@@ -82,6 +83,7 @@ const TodoList = (): JSX.Element => {
       ...todos[todoIndex],
       value: newTodo[0],
       dueDate: newTodo[1],
+      isComplete: newTodo[2],
     };
     try {
       await AsyncStorage.setItem(
@@ -124,19 +126,22 @@ const TodoList = (): JSX.Element => {
               todos.map(todo => {
                 return (
                   <View style={styles.todoItem} key={todo.id}>
+                    <TouchableOpacity style={styles.todoLeft}>
+                      <Text style={styles.button}> {'\u2713'} </Text>
+                    </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => {
                         setDialogTitle(`Edit Todo #${todo.id}`);
                         setShowDialog(true);
                         setSelectedTodo(todo);
                       }}
-                      style={styles.todoLeft}>
+                      style={styles.todoCenter}>
                       <Text style={styles.todoText} numberOfLines={2}>
                         {'\u2022'} {todo.value}
                       </Text>
                     </TouchableOpacity>
                     <Text
-                      style={styles.deleteButton}
+                      style={styles.button}
                       onPress={() => {
                         handleDeleteTodo(todo.id);
                       }}>
