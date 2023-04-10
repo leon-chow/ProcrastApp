@@ -15,25 +15,20 @@ const DialogComponent = ({
   onDismiss,
   selectedTodo,
 }: IProps): JSX.Element => {
-  const oneWeekLater = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    new Date().getDate() + 7,
-    new Date().getHours(),
-    new Date().getMinutes(),
-    new Date().getSeconds(),
-  );
+  const today = new Date();
+  const tomorrow = new Date();
+  const minDate = new Date();
+  minDate.setHours(minDate.getHours() + 1);
+  tomorrow.setTime(today.getTime() + 24 * 60 * 60 * 1000); // hours * minutes * seconds * ms
+
   const [todo, setTodo] = useState<string>(selectedTodo?.value || '');
-  const [startDate, setStartDate] = useState<Date>(
-    selectedTodo ? new Date(selectedTodo?.startDate!) : new Date(),
+  const [dueDate, setDueDate] = useState<Date>(
+    selectedTodo ? new Date(selectedTodo.dueDate) : tomorrow,
   );
-  const [endDate, setEndDate] = useState<Date>(
-    selectedTodo ? new Date(selectedTodo?.endDate!) : new Date(oneWeekLater),
-  );
-  const [startDateDialog, setStartDateDialog] = useState<boolean>(false);
-  const [endDateDialog, setEndDateDialog] = useState<boolean>(false);
+  const [dateDialog, setDateDialog] = useState<boolean>(false);
+
   const handleOnSubmit = () => {
-    const newTodo = [todo, startDate, endDate];
+    const newTodo = [todo, dueDate];
     onSubmit(newTodo);
   };
 
@@ -60,45 +55,25 @@ const DialogComponent = ({
           defaultValue={selectedTodo ? selectedTodo.value : ''}
         />
         <Text
-          style={startDate ? styles.datePickerPrompt : styles.placeholder}
-          onPress={() => setStartDateDialog(true)}>
-          Start Date & Time:{' '}
-          {startDate
-            ? `${startDate.toDateString()} ${startDate.toLocaleTimeString()}`
-            : 'Please enter a start date...'}
-        </Text>
-        <Text
-          style={endDate ? styles.datePickerPrompt : styles.placeholder}
-          onPress={() => setEndDateDialog(true)}>
-          End Date & Time:{' '}
-          {endDate
-            ? `${endDate.toDateString()} ${endDate.toLocaleTimeString()}`
-            : 'Please enter an end date...'}
+          style={dueDate ? styles.datePickerPrompt : styles.placeholder}
+          onPress={() => setDateDialog(true)}>
+          Due Date:{' '}
+          {dueDate
+            ? `${dueDate.toDateString()} ${dueDate.toLocaleTimeString()}`
+            : 'Please enter a due date...'}
         </Text>
         <DatePicker
           modal
-          open={startDateDialog}
-          date={startDate}
+          open={dateDialog}
+          date={dueDate}
+          minimumDate={minDate}
           onConfirm={date => {
-            setStartDateDialog(false);
-            setStartDate(date);
-            console.log(`new start date: ${startDate}`);
+            setDateDialog(false);
+            setDueDate(date);
+            console.log(`new start date: ${dueDate}`);
           }}
           onCancel={() => {
-            setStartDateDialog(false);
-          }}
-        />
-        <DatePicker
-          modal
-          open={endDateDialog}
-          date={endDate}
-          onConfirm={date => {
-            setEndDateDialog(false);
-            setEndDate(date);
-            console.log(`new end date: ${endDate}`);
-          }}
-          onCancel={() => {
-            setEndDateDialog(false);
+            setDateDialog(false);
           }}
         />
       </View>

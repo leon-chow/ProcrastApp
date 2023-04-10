@@ -36,8 +36,7 @@ const TodoList = (): JSX.Element => {
         const todo: Todo = {
           id: recordData.id,
           value: recordData.value,
-          startDate: recordData.startDate,
-          endDate: recordData.endDate,
+          dueDate: recordData.dueDate,
         };
         allTodos.push(todo);
       }
@@ -60,8 +59,7 @@ const TodoList = (): JSX.Element => {
     const newTodo: Todo = {
       id: newID,
       value: todo[0],
-      startDate: todo[1],
-      endDate: todo[2],
+      dueDate: todo[1],
     };
     try {
       await AsyncStorage.setItem(`${newID}`, JSON.stringify(newTodo), () => {
@@ -83,8 +81,7 @@ const TodoList = (): JSX.Element => {
     todos[todoIndex] = {
       ...todos[todoIndex],
       value: newTodo[0],
-      startDate: newTodo[1],
-      endDate: newTodo[2],
+      dueDate: newTodo[1],
     };
     try {
       await AsyncStorage.setItem(
