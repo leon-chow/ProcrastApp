@@ -16,7 +16,6 @@ const TodoList = (): JSX.Element => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('Add Todo');
   const [selectedTodo, setSelectedTodo] = useState<Todo>();
-  const [completedTodos, setCompletedTodos] = useState<Todo[]>([]);
 
   const handleDismiss = () => {
     setShowDialog(false);
@@ -33,16 +32,12 @@ const TodoList = (): JSX.Element => {
       const allTodos: Todo[] = [];
       for (const record of data) {
         const recordData = JSON.parse(record[1]!);
-        console.log('record: ', recordData);
         const todo: Todo = {
           id: recordData.id,
           value: recordData.value,
           dueDate: recordData.dueDate,
           isComplete: recordData.isComplete,
         };
-        if (recordData.isComplete) {
-          completedTodos.push(recordData);
-        }
         allTodos.push(todo);
       }
       setTodos(allTodos);
@@ -121,7 +116,7 @@ const TodoList = (): JSX.Element => {
 
   const handleMarkComplete = async (todo: Todo) => {
     const todoIndex = todos.findIndex(
-      currentTodo => currentTodo.id === todo!.id,
+      currentTodo => currentTodo.id === todo.id,
     );
     const completedTodo: Todo = {
       id: todo.id,
@@ -129,26 +124,17 @@ const TodoList = (): JSX.Element => {
       dueDate: todo.dueDate,
       isComplete: !todo.isComplete,
     };
-    if (completedTodo.isComplete) {
-      completedTodos.push(todo);
-    } else {
-      const newCompletedTodos = completedTodos.filter(
-        newTodo => newTodo.id !== todo.id,
-      );
-      setCompletedTodos(newCompletedTodos);
-      console.log(completedTodos);
-    }
     let newTodos: Todo[] = [...todos];
     newTodos[todoIndex] = completedTodo;
     setTodos(newTodos);
     try {
       await AsyncStorage.setItem(
-        `${todo!.id}`,
-        JSON.stringify(todos[todoIndex]),
+        `${todo.id}`,
+        JSON.stringify(newTodos[todoIndex]),
         () => {
           console.log(
-            `successfully saved todo with id ${todo!.id} with details of`,
-            todo,
+            `successfully saved todo with id ${completedTodo.id} with details of`,
+            completedTodo,
           );
         },
       );
@@ -205,10 +191,12 @@ const TodoList = (): JSX.Element => {
             )}
           </View>
           <View style={styles.todoList}>
+            {todos && todos.some(newTodo => newTodo.isComplete) && (
+              <Text style={styles.header}>Completed: </Text>
+            )}
             {todos &&
               todos.length > 0 &&
               todos.map(todo => {
-                <Text style={styles.header}>Completed: </Text>;
                 return (
                   todo.isComplete && (
                     <View style={styles.todoItem} key={todo.id}>
