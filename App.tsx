@@ -7,7 +7,7 @@ function App(): JSX.Element {
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View>
-          <Text style={styles.headerStyle}>Welcome to ProcrastApp! </Text>
+          <Text style={styles.headerStyle}>ProcrastApp </Text>
           <TodoList />
         </View>
       </ScrollView>
@@ -20,6 +20,9 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 32,
     flex: 1,
+    textAlign: 'center',
+    borderBottomWidth: 1,
+    borderColor: 'gray',
   },
 });
 

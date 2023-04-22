@@ -149,7 +149,9 @@ const TodoList = (): JSX.Element => {
         <View>
           <Text style={styles.header}>Todo: </Text>
           <View style={styles.todoList}>
-            {todos && todos.length > 0 ? (
+            {todos &&
+            todos.length > 0 &&
+            todos.some(todo => todo.isComplete !== true) ? (
               todos.map(todo => {
                 return (
                   !todo.isComplete && (
