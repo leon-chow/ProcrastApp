@@ -16,6 +16,7 @@ const TodoList = (): JSX.Element => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogTitle, setDialogTitle] = useState('Add Todo');
   const [selectedTodo, setSelectedTodo] = useState<Todo>();
+  const [completedTodos, setCompletedTodos] = useState<Todo[]>([]);
 
   const handleDismiss = () => {
     setShowDialog(false);
@@ -37,8 +38,11 @@ const TodoList = (): JSX.Element => {
           id: recordData.id,
           value: recordData.value,
           dueDate: recordData.dueDate,
-          isComplete: false,
+          isComplete: recordData.isComplete,
         };
+        if (recordData.isComplete) {
+          completedTodos.push(recordData);
+        }
         allTodos.push(todo);
       }
       setTodos(allTodos);
@@ -72,7 +76,6 @@ const TodoList = (): JSX.Element => {
       throw err;
     }
     todos.push(newTodo);
-    loadTodos();
     setShowDialog(false);
   };
 
@@ -116,6 +119,44 @@ const TodoList = (): JSX.Element => {
     }
   };
 
+  const handleMarkComplete = async (todo: Todo) => {
+    const todoIndex = todos.findIndex(
+      currentTodo => currentTodo.id === todo!.id,
+    );
+    const completedTodo: Todo = {
+      id: todo.id,
+      value: todo.value,
+      dueDate: todo.dueDate,
+      isComplete: !todo.isComplete,
+    };
+    if (completedTodo.isComplete) {
+      completedTodos.push(todo);
+    } else {
+      const newCompletedTodos = completedTodos.filter(
+        newTodo => newTodo.id !== todo.id,
+      );
+      setCompletedTodos(newCompletedTodos);
+      console.log(completedTodos);
+    }
+    let newTodos: Todo[] = [...todos];
+    newTodos[todoIndex] = completedTodo;
+    setTodos(newTodos);
+    try {
+      await AsyncStorage.setItem(
+        `${todo!.id}`,
+        JSON.stringify(todos[todoIndex]),
+        () => {
+          console.log(
+            `successfully saved todo with id ${todo!.id} with details of`,
+            todo,
+          );
+        },
+      );
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
@@ -125,29 +166,33 @@ const TodoList = (): JSX.Element => {
             {todos && todos.length > 0 ? (
               todos.map(todo => {
                 return (
-                  <View style={styles.todoItem} key={todo.id}>
-                    <TouchableOpacity style={styles.todoLeft}>
-                      <Text style={styles.button}> {'\u2713'} </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setDialogTitle(`Edit Todo #${todo.id}`);
-                        setShowDialog(true);
-                        setSelectedTodo(todo);
-                      }}
-                      style={styles.todoCenter}>
-                      <Text style={styles.todoText} numberOfLines={2}>
-                        {'\u2022'} {todo.value}
+                  !todo.isComplete && (
+                    <View style={styles.todoItem} key={todo.id}>
+                      <TouchableOpacity
+                        style={styles.todoLeft}
+                        onPress={() => handleMarkComplete(todo)}>
+                        <Text style={styles.button}> {'\u2713'} </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setDialogTitle(`Edit Todo #${todo.id}`);
+                          setShowDialog(true);
+                          setSelectedTodo(todo);
+                        }}
+                        style={styles.todoCenter}>
+                        <Text style={styles.todoText} numberOfLines={2}>
+                          {'\u2022'} {todo.value}
+                        </Text>
+                      </TouchableOpacity>
+                      <Text
+                        style={styles.button}
+                        onPress={() => {
+                          handleDeleteTodo(todo.id);
+                        }}>
+                        X
                       </Text>
-                    </TouchableOpacity>
-                    <Text
-                      style={styles.button}
-                      onPress={() => {
-                        handleDeleteTodo(todo.id);
-                      }}>
-                      X
-                    </Text>
-                  </View>
+                    </View>
+                  )
                 );
               })
             ) : (
@@ -158,6 +203,32 @@ const TodoList = (): JSX.Element => {
                 </Text>
               </View>
             )}
+          </View>
+          <View style={styles.todoList}>
+            {todos &&
+              todos.length > 0 &&
+              todos.map(todo => {
+                <Text style={styles.header}>Completed: </Text>;
+                return (
+                  todo.isComplete && (
+                    <View style={styles.todoItem} key={todo.id}>
+                      <TouchableOpacity
+                        style={styles.todoLeft}
+                        onPress={() => handleMarkComplete(todo)}
+                      />
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleMarkComplete(todo);
+                        }}
+                        style={styles.todoCenter}>
+                        <Text style={styles.completedTodo} numberOfLines={2}>
+                          {'\u2022'} {todo.value}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                );
+              })}
           </View>
           <View style={styles.buttonContainer}>
             <Button

@@ -58,4 +58,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     fontSize: 24,
   },
+  completedTodo: {
+    fontSize: 24,
+    textDecorationLine: 'line-through',
+  },
 });
