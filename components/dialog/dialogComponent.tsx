@@ -21,24 +21,21 @@ const DialogComponent = ({
   minDate.setHours(minDate.getHours() + 1);
   tomorrow.setTime(today.getTime() + 24 * 60 * 60 * 1000); // hours * minutes * seconds * ms
 
-  const [todo, setTodo] = useState<string>(selectedTodo?.value || '');
+  const [todo, setTodo] = useState<string>(selectedTodo?.title || '');
   const [dueDate, setDueDate] = useState<Date>(
     selectedTodo ? new Date(selectedTodo.dueDate) : tomorrow,
   );
-  const [isComplete, setIsComplete] = useState<boolean>(false);
+  const [priority, setPriority] = useState<String>('high');
+  const [details, setDetails] = useState<String>('');
   const [dateDialog, setDateDialog] = useState<boolean>(false);
 
   const handleOnSubmit = () => {
-    const newTodo = [todo, dueDate, isComplete];
+    const newTodo = [todo, details, dueDate, false];
     onSubmit(newTodo);
   };
 
   const handleOnDismiss = () => {
     onDismiss();
-  };
-
-  const handleInputChange = (text: string) => {
-    setTodo(text);
   };
 
   return (
@@ -50,10 +47,18 @@ const DialogComponent = ({
         <TextInput
           style={styles.textHeader}
           placeholder="Please enter your todo item"
-          onChangeText={handleInputChange}
+          onChangeText={setTodo}
           underlineColorAndroid="black"
           placeholderTextColor={'gray'}
-          defaultValue={selectedTodo ? selectedTodo.value : ''}
+          defaultValue={selectedTodo ? selectedTodo.title : ''}
+        />
+        <TextInput
+          style={styles.textHeader}
+          placeholder="Please enter the details..."
+          onChangeText={setDetails}
+          underlineColorAndroid="black"
+          placeholderTextColor={'gray'}
+          defaultValue={selectedTodo ? selectedTodo.details : ''}
         />
         <Text
           style={dueDate ? styles.datePickerPrompt : styles.placeholder}
@@ -80,7 +85,6 @@ const DialogComponent = ({
             setDateDialog(false);
           }}
         />
-        <Text> {isComplete} </Text>
       </View>
       <View style={styles.container}>
         <View style={styles.buttonContainer}>

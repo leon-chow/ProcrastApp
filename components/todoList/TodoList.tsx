@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
+import {loadTodos} from '../../services/todo-service';
 const TodoList = (): JSX.Element => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showDialog, setShowDialog] = useState(false);
@@ -22,30 +23,8 @@ const TodoList = (): JSX.Element => {
   };
 
   useEffect(() => {
-    loadTodos();
+    loadTodos(setTodos);
   }, []);
-
-  const loadTodos = async () => {
-    try {
-      const keys = await AsyncStorage.getAllKeys();
-      const data = await AsyncStorage.multiGet(keys);
-      const allTodos: Todo[] = [];
-      for (const record of data) {
-        const recordData = JSON.parse(record[1]!);
-        const todo: Todo = {
-          id: recordData.id,
-          value: recordData.value,
-          dueDate: recordData.dueDate,
-          isComplete: recordData.isComplete,
-        };
-        allTodos.push(todo);
-      }
-      setTodos(allTodos);
-      console.log(allTodos);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleAddTodo = async (todo: any): Promise<void> => {
     console.log('adding...');
@@ -57,9 +36,11 @@ const TodoList = (): JSX.Element => {
     }
     const newTodo: Todo = {
       id: newID,
-      value: todo[0],
-      dueDate: todo[1],
+      title: todo[0],
+      details: todo[1],
+      dueDate: todo[2],
       isComplete: false,
+      priority: 'low',
     };
     try {
       await AsyncStorage.setItem(`${newID}`, JSON.stringify(newTodo), () => {
@@ -79,9 +60,11 @@ const TodoList = (): JSX.Element => {
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
     todos[todoIndex] = {
       ...todos[todoIndex],
-      value: newTodo[0],
-      dueDate: newTodo[1],
-      isComplete: newTodo[2],
+      title: newTodo[0],
+      details: newTodo[1],
+      dueDate: newTodo[2],
+      isComplete: newTodo[3],
+      priority: newTodo[4],
     };
     try {
       await AsyncStorage.setItem(
@@ -120,9 +103,11 @@ const TodoList = (): JSX.Element => {
     );
     const completedTodo: Todo = {
       id: todo.id,
-      value: todo.value,
+      title: todo.title,
+      details: todo.details,
       dueDate: todo.dueDate,
       isComplete: !todo.isComplete,
+      priority: todo.priority,
     };
     let newTodos: Todo[] = [...todos];
     newTodos[todoIndex] = completedTodo;
@@ -169,7 +154,7 @@ const TodoList = (): JSX.Element => {
                         }}
                         style={styles.todoCenter}>
                         <Text style={styles.todoText} numberOfLines={2}>
-                          {'\u2022'} {todo.value}
+                          {'\u2022'} {todo.title}
                         </Text>
                       </TouchableOpacity>
                       <Text
@@ -212,7 +197,7 @@ const TodoList = (): JSX.Element => {
                         }}
                         style={styles.todoCenter}>
                         <Text style={styles.completedTodo} numberOfLines={2}>
-                          {'\u2022'} {todo.value}
+                          {'\u2022'} {todo.title}
                         </Text>
                       </TouchableOpacity>
                     </View>
