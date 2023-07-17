@@ -130,10 +130,12 @@ const TodoList = (): JSX.Element => {
 
   return (
     <SafeAreaView>
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View>
+      <View>
+        <View style={styles.container}>
           <Text style={styles.header}>Todo: </Text>
-          <View style={styles.todoList}>
+          <ScrollView
+            style={styles.todoList}
+            contentInsetAdjustmentBehavior="automatic">
             {todos &&
             todos.length > 0 &&
             todos.some(todo => todo.isComplete !== true) ? (
@@ -176,7 +178,7 @@ const TodoList = (): JSX.Element => {
                 </Text>
               </View>
             )}
-          </View>
+          </ScrollView>
           <View style={styles.todoList}>
             {todos && todos.some(newTodo => newTodo.isComplete) && (
               <Text style={styles.header}>Completed: </Text>
@@ -186,7 +188,9 @@ const TodoList = (): JSX.Element => {
               todos.map(todo => {
                 return (
                   todo.isComplete && (
-                    <View style={styles.todoItem} key={todo.id}>
+                    <View
+                      style={styles.todoItem}
+                      key={todo.id + Math.random() * 100000000}>
                       <TouchableOpacity
                         style={styles.todoLeft}
                         onPress={() => handleMarkComplete(todo)}
@@ -205,17 +209,6 @@ const TodoList = (): JSX.Element => {
                 );
               })}
           </View>
-          <View style={styles.buttonContainer}>
-            <Button
-              title={'Add Todo'}
-              color="dodgerblue"
-              onPress={() => {
-                setShowDialog(true);
-                setSelectedTodo(undefined);
-                setDialogTitle(`Add Todo #${todos.length + 1}`);
-              }}
-            />
-          </View>
         </View>
         {showDialog && (
           <DialogComponent
@@ -225,7 +218,19 @@ const TodoList = (): JSX.Element => {
             selectedTodo={selectedTodo}
           />
         )}
-      </ScrollView>
+      </View>
+      {/* TODO: Get the button on the page */}
+      <View style={styles.buttonContainer}>
+        <Button
+          title={'Add Todo'}
+          color="dodgerblue"
+          onPress={() => {
+            setShowDialog(true);
+            setSelectedTodo(undefined);
+            setDialogTitle(`Add Todo #${todos.length + 1}`);
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 };
