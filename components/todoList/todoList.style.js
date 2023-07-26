@@ -2,6 +2,7 @@ import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 50,
   },
   header: {
     padding: 10,
@@ -10,8 +11,8 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    padding: 10,
-    margin: 10,
+    width: '100%',
+    padding: 20,
   },
   todoList: {
     padding: 10,

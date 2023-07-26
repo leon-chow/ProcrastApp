@@ -1,17 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import {ScrollView, Text, View, TouchableOpacity} from 'react-native';
 import {styles} from './todoList.style';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
 import {loadTodos} from '../../services/todo-service';
+import {Priority} from '../../utils/interfaces/Priority';
 const TodoList = (): JSX.Element => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showDialog, setShowDialog] = useState(false);
@@ -26,10 +21,25 @@ const TodoList = (): JSX.Element => {
     loadTodos(setTodos);
   }, []);
 
+  const sortTodos = (): void => {
+    const priorityOrder = Object.values(Priority);
+    const sortedTodos = todos
+      .sort(
+        (todoA, todoB) =>
+          priorityOrder.indexOf(todoB.priority) -
+          priorityOrder.indexOf(todoA.priority),
+      )
+      .sort((todoA, todoB) => todoB.id - todoA.id);
+    console.log(sortedTodos);
+    setTodos(sortedTodos);
+  };
+
   const handleAddTodo = async (todo: any): Promise<void> => {
     console.log('adding...');
-    const newID = todos.length + 1;
-    console.log(todo);
+    let newID = Math.floor(Math.random() * 1000000);
+    while (todos.some(t => t.id === newID)) {
+      newID = Math.floor(Math.random() * 1000000);
+    }
     if (!todo) {
       handleDismiss();
       return;
@@ -39,9 +49,11 @@ const TodoList = (): JSX.Element => {
       title: todo[0],
       details: todo[1],
       dueDate: todo[2],
+      priority: todo[3],
       isComplete: false,
-      priority: 'low',
     };
+    console.log(newID);
+    console.log(newTodo);
     try {
       await AsyncStorage.setItem(`${newID}`, JSON.stringify(newTodo), () => {
         console.log(
@@ -52,10 +64,12 @@ const TodoList = (): JSX.Element => {
       throw err;
     }
     todos.push(newTodo);
+    sortTodos();
     setShowDialog(false);
   };
 
   const handleEditTodo = async (newTodo: any): Promise<void> => {
+    console.log(newTodo);
     console.log('editing...');
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
     todos[todoIndex] = {
@@ -63,8 +77,8 @@ const TodoList = (): JSX.Element => {
       title: newTodo[0],
       details: newTodo[1],
       dueDate: newTodo[2],
-      isComplete: newTodo[3],
-      priority: newTodo[4],
+      priority: newTodo[3],
+      isComplete: newTodo[4],
     };
     try {
       await AsyncStorage.setItem(
@@ -81,6 +95,7 @@ const TodoList = (): JSX.Element => {
     } catch (err) {
       throw err;
     }
+    sortTodos();
     setShowDialog(false);
   };
 
@@ -129,97 +144,7 @@ const TodoList = (): JSX.Element => {
   };
 
   return (
-    <SafeAreaView>
-      <View>
-        <View style={styles.container}>
-          <Text style={styles.header}>Todo: </Text>
-          <ScrollView
-            style={styles.todoList}
-            contentInsetAdjustmentBehavior="automatic">
-            {todos &&
-            todos.length > 0 &&
-            todos.some(todo => todo.isComplete !== true) ? (
-              todos.map(todo => {
-                return (
-                  !todo.isComplete && (
-                    <View style={styles.todoItem} key={todo.id}>
-                      <TouchableOpacity
-                        style={styles.todoLeft}
-                        onPress={() => handleMarkComplete(todo)}>
-                        <Text style={styles.button}> {'\u2713'} </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setDialogTitle(`Edit Todo #${todo.id}`);
-                          setShowDialog(true);
-                          setSelectedTodo(todo);
-                        }}
-                        style={styles.todoCenter}>
-                        <Text style={styles.todoText} numberOfLines={2}>
-                          {'\u2022'} {todo.title}
-                        </Text>
-                      </TouchableOpacity>
-                      <Text
-                        style={styles.button}
-                        onPress={() => {
-                          handleDeleteTodo(todo.id);
-                        }}>
-                        X
-                      </Text>
-                    </View>
-                  )
-                );
-              })
-            ) : (
-              <View>
-                <Text style={styles.todoPrompt}>
-                  Hooray! You have nothing left to do... To get started, you can
-                  add a new todo...
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-          <View style={styles.todoList}>
-            {todos && todos.some(newTodo => newTodo.isComplete) && (
-              <Text style={styles.header}>Completed: </Text>
-            )}
-            {todos &&
-              todos.length > 0 &&
-              todos.map(todo => {
-                return (
-                  todo.isComplete && (
-                    <View
-                      style={styles.todoItem}
-                      key={todo.id + Math.random() * 100000000}>
-                      <TouchableOpacity
-                        style={styles.todoLeft}
-                        onPress={() => handleMarkComplete(todo)}
-                      />
-                      <TouchableOpacity
-                        onPress={() => {
-                          handleMarkComplete(todo);
-                        }}
-                        style={styles.todoCenter}>
-                        <Text style={styles.completedTodo} numberOfLines={2}>
-                          {'\u2022'} {todo.title}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  )
-                );
-              })}
-          </View>
-        </View>
-        {showDialog && (
-          <DialogComponent
-            title={dialogTitle}
-            onSubmit={selectedTodo ? handleEditTodo : handleAddTodo}
-            onDismiss={handleDismiss}
-            selectedTodo={selectedTodo}
-          />
-        )}
-      </View>
-      {/* TODO: Get the button on the page */}
+    <View>
       <View style={styles.buttonContainer}>
         <Button
           title={'Add Todo'}
@@ -231,7 +156,99 @@ const TodoList = (): JSX.Element => {
           }}
         />
       </View>
-    </SafeAreaView>
+      <View style={styles.container}>
+        {/* TODO: Get the button on the page */}
+        <Text style={styles.header}>Todo: </Text>
+      </View>
+      <View>
+        {showDialog && (
+          <DialogComponent
+            title={dialogTitle}
+            onSubmit={selectedTodo ? handleEditTodo : handleAddTodo}
+            onDismiss={handleDismiss}
+            selectedTodo={selectedTodo}
+          />
+        )}
+      </View>
+      <ScrollView
+        style={styles.todoList}
+        contentInsetAdjustmentBehavior="automatic">
+        {todos &&
+        todos.length > 0 &&
+        todos.some(todo => todo.isComplete !== true) ? (
+          todos.map(todo => {
+            return (
+              !todo.isComplete && (
+                <View style={styles.todoItem} key={todo.id}>
+                  <TouchableOpacity
+                    style={styles.todoLeft}
+                    onPress={() => handleMarkComplete(todo)}>
+                    <Text style={styles.button}> {'\u2713'} </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setDialogTitle(
+                        `Edit Todo #${
+                          todos.findIndex(newTodo => newTodo.id === todo.id) + 1
+                        }`,
+                      );
+                      setShowDialog(true);
+                      setSelectedTodo(todo);
+                    }}
+                    style={styles.todoCenter}>
+                    <Text style={styles.todoText} numberOfLines={2}>
+                      {'\u2022'} {todo.title}
+                    </Text>
+                  </TouchableOpacity>
+                  <Text
+                    style={styles.button}
+                    onPress={() => {
+                      handleDeleteTodo(todo.id);
+                    }}>
+                    X
+                  </Text>
+                </View>
+              )
+            );
+          })
+        ) : (
+          <View>
+            <Text style={styles.todoPrompt}>
+              Hooray! You have nothing left to do... To get started, you can add
+              a new todo...
+            </Text>
+          </View>
+        )}
+        {todos && todos.some(newTodo => newTodo.isComplete) && (
+          <Text style={styles.header}>Completed: </Text>
+        )}
+        {todos &&
+          todos.length > 0 &&
+          todos.map(todo => {
+            return (
+              todo.isComplete && (
+                <View
+                  style={styles.todoItem}
+                  key={Math.random() * 100000000 + todo.id}>
+                  <TouchableOpacity
+                    style={styles.todoLeft}
+                    onPress={() => handleMarkComplete(todo)}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleMarkComplete(todo);
+                    }}
+                    style={styles.todoCenter}>
+                    <Text style={styles.completedTodo} numberOfLines={2}>
+                      {'\u2022'} {todo.title}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )
+            );
+          })}
+      </ScrollView>
+    </View>
   );
 };
 

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Modal, Text, Button, View, TextInput, StyleSheet} from 'react-native';
 import {Todo} from '../../utils/interfaces/Todo';
 import DatePicker from 'react-native-date-picker';
+import {Picker} from '@react-native-picker/picker';
 
 interface IProps {
   title: string;
@@ -25,12 +26,14 @@ const DialogComponent = ({
   const [dueDate, setDueDate] = useState<Date>(
     selectedTodo ? new Date(selectedTodo.dueDate) : tomorrow,
   );
-  const [priority, setPriority] = useState<String>('high');
+  const [priority, setPriority] = useState<String>(
+    selectedTodo ? selectedTodo.priority : 'low',
+  );
   const [details, setDetails] = useState<String>('');
   const [dateDialog, setDateDialog] = useState<boolean>(false);
 
   const handleOnSubmit = () => {
-    const newTodo = [todo, details, dueDate, false];
+    const newTodo = [todo, details, dueDate, priority, false];
     onSubmit(newTodo);
   };
 
@@ -85,6 +88,16 @@ const DialogComponent = ({
             setDateDialog(false);
           }}
         />
+        <View>
+          <Text style={styles.label}> Priority </Text>
+          <Picker
+            selectedValue={priority}
+            onValueChange={itemValue => setPriority(itemValue)}>
+            <Picker.Item label="Low" value="low" />
+            <Picker.Item label="Medium" value="med" />
+            <Picker.Item label="High" value="high" />
+          </Picker>
+        </View>
       </View>
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
@@ -132,6 +145,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     color: 'gray',
+    textDecorationLine: 'underline',
+  },
+  label: {
+    paddingLeft: 12.5,
+    color: 'black',
+    fontSize: 20,
     textDecorationLine: 'underline',
   },
 });

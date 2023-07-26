@@ -1,14 +1,12 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text} from 'react-native';
+import {SafeAreaView, StyleSheet, Text} from 'react-native';
 import TodoList from './components/todoList/TodoList';
 
 function App(): JSX.Element {
   return (
     <SafeAreaView>
       <Text style={styles.headerStyle}>ProcrastApp </Text>
-      <ScrollView>
-        <TodoList />
-      </ScrollView>
+      <TodoList />
     </SafeAreaView>
   );
 }
