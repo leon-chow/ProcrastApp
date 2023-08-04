@@ -6,7 +6,7 @@ import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
 import {loadTodos} from '../../services/todo-service';
-import {Priority} from '../../utils/interfaces/Priority';
+
 const TodoList = (): JSX.Element => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showDialog, setShowDialog] = useState(false);
@@ -20,19 +20,6 @@ const TodoList = (): JSX.Element => {
   useEffect(() => {
     loadTodos(setTodos);
   }, []);
-
-  const sortTodos = (): void => {
-    const priorityOrder = Object.values(Priority);
-    const sortedTodos = todos
-      .sort(
-        (todoA, todoB) =>
-          priorityOrder.indexOf(todoB.priority) -
-          priorityOrder.indexOf(todoA.priority),
-      )
-      .sort((todoA, todoB) => todoB.id - todoA.id);
-    console.log(sortedTodos);
-    setTodos(sortedTodos);
-  };
 
   const handleAddTodo = async (todo: any): Promise<void> => {
     console.log('adding...');
@@ -64,7 +51,6 @@ const TodoList = (): JSX.Element => {
       throw err;
     }
     todos.push(newTodo);
-    sortTodos();
     setShowDialog(false);
   };
 
@@ -95,7 +81,6 @@ const TodoList = (): JSX.Element => {
     } catch (err) {
       throw err;
     }
-    sortTodos();
     setShowDialog(false);
   };
 
@@ -144,7 +129,7 @@ const TodoList = (): JSX.Element => {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <Button
           title={'Add Todo'}
@@ -156,23 +141,10 @@ const TodoList = (): JSX.Element => {
           }}
         />
       </View>
-      <View style={styles.container}>
-        {/* TODO: Get the button on the page */}
-        <Text style={styles.header}>Todo: </Text>
-      </View>
-      <View>
-        {showDialog && (
-          <DialogComponent
-            title={dialogTitle}
-            onSubmit={selectedTodo ? handleEditTodo : handleAddTodo}
-            onDismiss={handleDismiss}
-            selectedTodo={selectedTodo}
-          />
-        )}
-      </View>
       <ScrollView
         style={styles.todoList}
         contentInsetAdjustmentBehavior="automatic">
+        <Text style={styles.header}>Todo: </Text>
         {todos &&
         todos.length > 0 &&
         todos.some(todo => todo.isComplete !== true) ? (
@@ -227,9 +199,7 @@ const TodoList = (): JSX.Element => {
           todos.map(todo => {
             return (
               todo.isComplete && (
-                <View
-                  style={styles.todoItem}
-                  key={Math.random() * 100000000 + todo.id}>
+                <View style={styles.todoItem} key={todo.id}>
                   <TouchableOpacity
                     style={styles.todoLeft}
                     onPress={() => handleMarkComplete(todo)}
@@ -248,6 +218,16 @@ const TodoList = (): JSX.Element => {
             );
           })}
       </ScrollView>
+      <View>
+        {showDialog && (
+          <DialogComponent
+            title={dialogTitle}
+            onSubmit={selectedTodo ? handleEditTodo : handleAddTodo}
+            onDismiss={handleDismiss}
+            selectedTodo={selectedTodo}
+          />
+        )}
+      </View>
     </View>
   );
 };

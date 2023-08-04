@@ -1,8 +1,7 @@
 import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginBottom: 50,
+    marginBottom: 200,
   },
   header: {
     padding: 10,
@@ -17,6 +16,8 @@ export const styles = StyleSheet.create({
   todoList: {
     padding: 10,
     margin: 10,
+    flexGrow: 1,
+    marginBottom: 100,
   },
   todoLeft: {
     flexDirection: 'row',
