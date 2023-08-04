@@ -29,7 +29,9 @@ const DialogComponent = ({
   const [priority, setPriority] = useState<String>(
     selectedTodo ? selectedTodo.priority : 'low',
   );
-  const [details, setDetails] = useState<String>('');
+  const [details, setDetails] = useState<String>(
+    selectedTodo ? selectedTodo.details : '',
+  );
   const [dateDialog, setDateDialog] = useState<boolean>(false);
 
   const handleOnSubmit = () => {

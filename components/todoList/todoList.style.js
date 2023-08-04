@@ -16,38 +16,38 @@ export const styles = StyleSheet.create({
   todoList: {
     padding: 10,
     margin: 10,
-    flexGrow: 1,
     marginBottom: 100,
   },
   todoLeft: {
-    flexDirection: 'row',
     justifyContent: 'flex-start',
     alignContent: 'flex-start',
+    textAlign: 'left',
   },
   todoCenter: {
-    flexDirection: 'column',
-    flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'space-between',
   },
   todoRight: {
-    flexDirection: 'row',
-    minWidth: 30,
     justifyContent: 'flex-end',
     alignContent: 'flex-end',
-    alignItems: 'flex-end',
+    textAlign: 'right',
+  },
+  todoTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   todoText: {
-    fontSize: 24,
+    fontSize: 16,
   },
   todoItem: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     borderWidth: 1,
     padding: 10,
     margin: 10,
     borderRadius: 10,
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   todoPrompt: {
@@ -55,8 +55,6 @@ export const styles = StyleSheet.create({
     color: 'gray',
   },
   button: {
-    alignContent: 'flex-end',
-    justifyContent: 'flex-end',
     fontSize: 24,
   },
   completedTodo: {

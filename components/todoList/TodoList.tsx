@@ -153,11 +153,6 @@ const TodoList = (): JSX.Element => {
               !todo.isComplete && (
                 <View style={styles.todoItem} key={todo.id}>
                   <TouchableOpacity
-                    style={styles.todoLeft}
-                    onPress={() => handleMarkComplete(todo)}>
-                    <Text style={styles.button}> {'\u2713'} </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
                     onPress={() => {
                       setDialogTitle(
                         `Edit Todo #${
@@ -166,19 +161,29 @@ const TodoList = (): JSX.Element => {
                       );
                       setShowDialog(true);
                       setSelectedTodo(todo);
-                    }}
-                    style={styles.todoCenter}>
+                    }}>
+                    <Text style={styles.todoTitle} numberOfLines={1}>
+                      {todo.title}
+                    </Text>
                     <Text style={styles.todoText} numberOfLines={2}>
-                      {'\u2022'} {todo.title}
+                      {' '}
+                      {todo.details}{' '}
                     </Text>
                   </TouchableOpacity>
-                  <Text
-                    style={styles.button}
-                    onPress={() => {
-                      handleDeleteTodo(todo.id);
-                    }}>
-                    X
-                  </Text>
+                  <View style={styles.todoCenter}>
+                    <TouchableOpacity
+                      style={styles.todoLeft}
+                      onPress={() => handleMarkComplete(todo)}>
+                      <Text style={styles.button}> {'\u2713'} </Text>
+                    </TouchableOpacity>
+                    <Text
+                      style={[styles.button, styles.todoRight]}
+                      onPress={() => {
+                        handleDeleteTodo(todo.id);
+                      }}>
+                      X
+                    </Text>
+                  </View>
                 </View>
               )
             );
@@ -199,21 +204,18 @@ const TodoList = (): JSX.Element => {
           todos.map(todo => {
             return (
               todo.isComplete && (
-                <View style={styles.todoItem} key={todo.id}>
-                  <TouchableOpacity
-                    style={styles.todoLeft}
-                    onPress={() => handleMarkComplete(todo)}
-                  />
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleMarkComplete(todo);
-                    }}
-                    style={styles.todoCenter}>
+                <TouchableOpacity
+                  style={styles.todoItem}
+                  key={todo.id}
+                  onPress={() => {
+                    handleMarkComplete(todo);
+                  }}>
+                  <View style={styles.todoCenter}>
                     <Text style={styles.completedTodo} numberOfLines={2}>
-                      {'\u2022'} {todo.title}
+                      {todo.title}
                     </Text>
-                  </TouchableOpacity>
-                </View>
+                  </View>
+                </TouchableOpacity>
               )
             );
           })}
