@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {ScrollView, Text, View, TouchableOpacity} from 'react-native';
 import {styles} from './todoList.style';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +20,13 @@ const TodoList = (): JSX.Element => {
   useEffect(() => {
     loadTodos(setTodos);
   }, []);
+
+  useMemo(() => {
+    todos.sort((a, b) =>
+      a.priority === b.priority ? b.id - a.id : b.priority - a.priority,
+    );
+    console.log('sorting...');
+  }, [todos]);
 
   const handleAddTodo = async (todo: any): Promise<void> => {
     console.log('adding...');
@@ -50,7 +57,9 @@ const TodoList = (): JSX.Element => {
     } catch (err) {
       throw err;
     }
-    todos.push(newTodo);
+    let newTodos: Todo[] = [...todos];
+    newTodos.push(newTodo);
+    setTodos(newTodos);
     setShowDialog(false);
   };
 
@@ -58,7 +67,7 @@ const TodoList = (): JSX.Element => {
     console.log(newTodo);
     console.log('editing...');
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
-    todos[todoIndex] = {
+    const editedTodo: Todo = {
       ...todos[todoIndex],
       title: newTodo[0],
       details: newTodo[1],
@@ -66,6 +75,9 @@ const TodoList = (): JSX.Element => {
       priority: newTodo[3],
       isComplete: newTodo[4],
     };
+    let newTodos: Todo[] = [...todos];
+    newTodos[todoIndex] = editedTodo;
+    setTodos(newTodos);
     try {
       await AsyncStorage.setItem(
         `${selectedTodo!.id}`,
@@ -81,6 +93,7 @@ const TodoList = (): JSX.Element => {
     } catch (err) {
       throw err;
     }
+    setTodos(todos);
     setShowDialog(false);
   };
 

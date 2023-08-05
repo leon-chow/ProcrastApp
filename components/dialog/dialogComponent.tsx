@@ -26,8 +26,8 @@ const DialogComponent = ({
   const [dueDate, setDueDate] = useState<Date>(
     selectedTodo ? new Date(selectedTodo.dueDate) : tomorrow,
   );
-  const [priority, setPriority] = useState<String>(
-    selectedTodo ? selectedTodo.priority : 'low',
+  const [priority, setPriority] = useState<number>(
+    selectedTodo ? selectedTodo.priority : 1,
   );
   const [details, setDetails] = useState<String>(
     selectedTodo ? selectedTodo.details : '',
@@ -95,9 +95,9 @@ const DialogComponent = ({
           <Picker
             selectedValue={priority}
             onValueChange={itemValue => setPriority(itemValue)}>
-            <Picker.Item label="Low" value="low" />
-            <Picker.Item label="Medium" value="med" />
-            <Picker.Item label="High" value="high" />
+            <Picker.Item label="Low" value={1} />
+            <Picker.Item label="Medium" value={2} />
+            <Picker.Item label="High" value={3} />
           </Picker>
         </View>
       </View>
