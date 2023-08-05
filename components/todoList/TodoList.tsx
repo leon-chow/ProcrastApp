@@ -6,6 +6,7 @@ import {Button} from '@react-native-material/core';
 import {Todo} from '../../utils/interfaces/Todo';
 import DialogComponent from '../dialog/dialogComponent';
 import {loadTodos} from '../../services/todo-service';
+import {Priority} from '../../utils/enums/Priority';
 
 const TodoList = (): JSX.Element => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -40,11 +41,11 @@ const TodoList = (): JSX.Element => {
     }
     const newTodo: Todo = {
       id: newID,
-      title: todo[0],
-      details: todo[1],
-      dueDate: todo[2],
-      priority: todo[3],
-      isComplete: false,
+      title: todo.title,
+      details: todo.details,
+      dueDate: todo.dueDate,
+      priority: todo.priority,
+      isComplete: todo.isComplete,
     };
     console.log(newID);
     console.log(newTodo);
@@ -63,21 +64,20 @@ const TodoList = (): JSX.Element => {
     setShowDialog(false);
   };
 
-  const handleEditTodo = async (newTodo: any): Promise<void> => {
+  const handleEditTodo = async (newTodo: Todo): Promise<void> => {
     console.log(newTodo);
     console.log('editing...');
     const todoIndex = todos.findIndex(todo => todo.id === selectedTodo!.id);
     const editedTodo: Todo = {
-      ...todos[todoIndex],
-      title: newTodo[0],
-      details: newTodo[1],
-      dueDate: newTodo[2],
-      priority: newTodo[3],
-      isComplete: newTodo[4],
+      id: todoIndex,
+      title: newTodo.title,
+      details: newTodo.details,
+      dueDate: newTodo.dueDate,
+      priority: newTodo.priority,
+      isComplete: newTodo.isComplete,
     };
     let newTodos: Todo[] = [...todos];
     newTodos[todoIndex] = editedTodo;
-    setTodos(newTodos);
     try {
       await AsyncStorage.setItem(
         `${selectedTodo!.id}`,
@@ -93,7 +93,7 @@ const TodoList = (): JSX.Element => {
     } catch (err) {
       throw err;
     }
-    setTodos(todos);
+    setTodos(newTodos);
     setShowDialog(false);
   };
 
@@ -179,8 +179,7 @@ const TodoList = (): JSX.Element => {
                       {todo.title}
                     </Text>
                     <Text style={styles.todoText} numberOfLines={2}>
-                      {' '}
-                      {todo.details}{' '}
+                      {todo.details}
                     </Text>
                   </TouchableOpacity>
                   <View style={styles.todoCenter}>
@@ -189,6 +188,9 @@ const TodoList = (): JSX.Element => {
                       onPress={() => handleMarkComplete(todo)}>
                       <Text style={styles.button}> {'\u2713'} </Text>
                     </TouchableOpacity>
+                    <Text style={styles.todoText}>
+                      Priority: {Priority[todo.priority]}
+                    </Text>
                     <Text
                       style={[styles.button, styles.todoRight]}
                       onPress={() => {

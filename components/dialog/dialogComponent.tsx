@@ -29,13 +29,19 @@ const DialogComponent = ({
   const [priority, setPriority] = useState<number>(
     selectedTodo ? selectedTodo.priority : 1,
   );
-  const [details, setDetails] = useState<String>(
+  const [details, setDetails] = useState<string>(
     selectedTodo ? selectedTodo.details : '',
   );
   const [dateDialog, setDateDialog] = useState<boolean>(false);
 
   const handleOnSubmit = () => {
-    const newTodo = [todo, details, dueDate, priority, false];
+    const newTodo = {
+      title: todo,
+      details: details,
+      dueDate: dueDate.toString(),
+      priority: priority,
+      isComplete: false,
+    };
     onSubmit(newTodo);
   };
 
